@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Live timer-auction application based on socket",
   "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "set MODE=dev&& node ./src/app.js",
+    "serve": "set MODE=dev&& nodemon ./src/app.js",
+    "test": "mocha --recursive"
   },
   "repository": {
     "type": "git",

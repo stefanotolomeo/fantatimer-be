@@ -1,0 +1,11 @@
+install openssl
+generate certificate and key: openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+follow steps to create it
+install it in the machine and add it to trusted certificates: 
+
+here: https://www.pico.net/kb/how-do-you-get-chrome-to-accept-a-self-signed-certificate
+or here: https://www.ge.com/digital/documentation/historian/version80/t_hgs_enabling_trust_for_a_self_signed_certificate.html
+https://support.globalsign.com/digital-certificates/digital-certificate-installation/install-client-digital-certificate-windows-using-chrome
+https://coderwall.com/p/wv6fpq/add-self-signed-ssl-certificate-to-android-for-browsing
+
+

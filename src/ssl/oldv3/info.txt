@@ -1,0 +1,4 @@
+steps: https://medium.com/@tbusser/creating-a-browser-trusted-self-signed-ssl-certificate-2709ce43fd15
+
+password: AbiliaXOOM
+passphrase: AbiliaXOOM
