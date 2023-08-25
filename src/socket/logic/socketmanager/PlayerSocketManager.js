@@ -2,9 +2,12 @@ const log = require('../../../config/logger.js')
 
 const { v4: uuid_v4 } = require('uuid');
 
-/* const Client = require('../../../model/Client.js');
+const Client = require('../../../model/Client.js');
+const stateClientsManager = require("../../../logic/StateClientsManager");
+const StatePlayersManager = require('../../../logic/StatePlayersManager.js');
+const { notifyToAllClients, notifyToClientWithId } = require('./NotifierMessage.js');
+/* 
 
-const stateClientsManager = require("../../../logic/game/StateClientsManager");
 const stateGamersManager = require("../../../logic/game/StateGamersManager");
 const stateGameManager = require("../../../logic/game/StateGameManager");
 const stateRequestManager = require("../../../logic/game/StateRequestManager");
@@ -18,10 +21,9 @@ const messageCreator = require('../MessageCreator.js');
 
 const { processPlayerMessage } = require('../messageprocessor/player/PlayerActionProcessor.js');
 const ModalityPlayerEnum = require('../../model/ModalityPlayerEnum.js');
-const { notifyToController, notifyToPlayerWithId } = require('./NotifierMessage.js'); */
+*/
 
 exports.initForPlayer = function (socketServer, data) {
-  let ctrlNamespace = socketServer.controllerNamespace
   let plNamespace = socketServer.playerNamespace
 
   plNamespace.on("connection", (socket) => {
@@ -34,49 +36,47 @@ exports.initForPlayer = function (socketServer, data) {
         let clientId = msg.client_id
         try {
           log.debug(`Player Authenticated with Message=${JSON.stringify(msg)}`)
-          /* let mode = msg.mode
+
           let isNewConnection = true
-          let dataToPlayer = {
-            video_info: stateGameManager.getVideoInfo(),
-            sounds_elements: stateGameManager.getSoundElements(),
-            elements: []  // TODO: add all added elements (e.g. text, etc)
-          }
-          if (clientId && stateClientsManager.getPlayer(mode).client_id == clientId) {
-            log.debug(`Reconnection for Player=${clientId} with Mode=${mode}`)
+          if (clientId && stateClientsManager.existsClient(clientId)) {
+            log.debug(`Reconnection for Client=${clientId} with SocketId=${socket.id}`)
             isNewConnection = false;
-            stateClientsManager.saveSocketIdForPlayer(socket.id, mode)
+            stateClientsManager.saveSocketIdForClient(socket.id, mode)
           } else {
             // It's a New-Connection: Save the new Player
-            log.debug(`New Connection for Player=${clientId} with Mode=${mode}`)
+            log.debug(`New Connection for Client=${clientId} with SocketId=${socket.id}`)
 
             // Add the new Client to Clients-Status
-            stateClientsManager.setPlayer(Client(clientId, socket.id), mode)
+            stateClientsManager.addNewClient(Client(clientId, socket.id))
+            
+            // TODO: to be handled
             // Add the new Player to Game-Status
-            stateGamersManager.addPlayer(clientId, mode)
+            // stateGamersManager.addPlayer(clientId, mode)
           }
 
-          let msgForPlayer = messageCreator.createMessage(msg.request_id, msg.client_id, socket.id, ActionPlayer.AUTHENTICATION, TypeAuthenticationPlayer.LOAD_DATA, dataToPlayer)
-      
-          // TODO: use MessageCreator
-          let msgForController = {
+          // Define the content to be passed to this Client
+          let dataToPlayer = {
+            clients: stateClientsManager.getClients(),  // All connected-clients
+            players: StatePlayersManager.getPlayers()   // All players
+          }
+
+          // Create Message to reply this Client
+          let msgForClient = messageCreator.createMessage(
+            msg.request_id, msg.client_id, socket.id, ActionPlayer.AUTHENTICATION, TypeAuthenticationPlayer.LOAD_DATA, dataToPlayer)
+
+          let msgForOthers = {
             request_id: msg.request_id,
-            action: ActionPlayer.CONNECTION,
-            type: isNewConnection ? TypeConnectionPlayer.PLAYER_CONNECTED : TypeConnectionPlayer.PLAYER_RECONNECTED,
-            payload: {
-              connected_client_id: clientId
-            }
-          }
-
-          if(mode == ModalityPlayerEnum.VR) {
-            // Add Request as completed (just for the Request-To-File Process)
-            stateRequestManager.addRequestAsCompleted(msgForController)
+            // action: ActionPlayer.CONNECTION,
+            // type: isNewConnection ? TypeConnectionPlayer.PLAYER_CONNECTED : TypeConnectionPlayer.PLAYER_RECONNECTED,
+            payload: dataToPlayer
           }
 
           // Send the data to the Player
-          notifyToPlayerWithId(socketServer, plNamespace, socket.id, msgForPlayer, mode)
+          notifyToClientWithId(socketServer, plNamespace, socket.id, msgForClient)
 
           // Send the notification to Controller
-          notifyToController(socketServer, ctrlNamespace, msgForController) */
+          notifyToAllClients(socketServer, plNamespace, msgForOthers)
+
         } catch (e) {
           log.error(e)
           log.error(`Error while Authenticating Player=${clientId}: ${JSON.stringify(e)}`)
@@ -87,34 +87,35 @@ exports.initForPlayer = function (socketServer, data) {
         try {
           log.debug(`Disconnected Player with Socket-Id=${socket.id} due to: ${reason}`)
           
-          /* let plClient = stateClientsManager.getPlayerBySocketId(socket.id)
-          if(plClient && plClient.socket_id && plClient.socket_id != socket.id) {
-            log.warn(`Socket-Id=${socket.id} not recognized for Disconnected-Player. Found Socket-Id=${plClient.socket_id}`)
+          let client = stateClientsManager.getClientBySocketId(socket.id)
+          if(client && client.socket_id && client.socket_id != socket.id) {
+            log.warn(`Socket-Id=${socket.id} not recognized for Disconnected-Player. Found Socket-Id=${client.socket_id}`)
             return
           }
-          let mode = plClient.mode
+
           // (1) Remove the Player from Clients
-          stateClientsManager.resetPlayer(plClient.client_id, mode)
+          stateClientsManager.resetClient(plClient.client_id, mode)
           // (2) Remove the Player from Gamers
-          stateGamersManager.resetPlayer(mode)
+          // TODO: reset from here as well
+          // stateGamersManager.resetPlayer(mode)
 
-          // (3) Notify to Player (only if disconnected player is VR and controller is connected)
-          if(mode == ModalityPlayerEnum.VR) {
-            
-            let msgForController = {
-              request_id: uuid_v4(),
-              action: ActionPlayer.CONNECTION,
-              type: TypeConnectionPlayer.PLAYER_DISCONNECTED,
-              payload: {
-                disconnected_client_id: plClient.client_id
-              }
-            }
+          // (3) Notify to Other clients
 
-            // Add Request as completed (just for the Request-To-File Process)
-            stateRequestManager.addRequestAsCompleted(msgForController)
+          // Define the content to be passed to this Client
+          let dataToAll = {
+            clients: stateClientsManager.getClients(),  // All connected-clients
+            players: StatePlayersManager.getPlayers()   // All players
+          }
+          
+          let msgForOthers = {
+            request_id: uuid_v4(),
+            action: ActionPlayer.CONNECTION,
+            type: TypeConnectionPlayer.PLAYER_DISCONNECTED,
+            payload: dataToAll
+          }
 
-            notifyToController(socketServer, ctrlNamespace, msgForController)
-          } */
+          // Send the notification to Controller
+          notifyToAllClients(socketServer, plNamespace, msgForOthers)
 
         } catch (e) {
           log.error(`Error while disconnecting Player=${socket.id}`, e)

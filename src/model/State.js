@@ -1,21 +1,23 @@
-const Data = require("./Data")
-const Game = require("./game/Game")
+const Player = require("./Player")
+
+const PLAYER_1 = Player("tolo", "giavazzi", "pass1111")
+const PLAYER_2 = Player("ivan", "aaa", "pass1111")
+const PLAYER_3 = Player("fra", "aaa", "pass1111")
+const PLAYER_4 = Player("dennis", "aaa", "pass1111")
+const PLAYER_5 = Player("ema", "aaa", "pass1111")
+const PLAYER_6 = Player("cari", "aaa", "pass1111")
+const PLAYER_7 = Player("nico", "aaa", "pass1111")
+const PLAYER_8 = Player("davide", "aaa", "pass1111")
 
 const State = () => {
     return {
-        data: Data(),
-        clients: {
-            player_vr: {},      // The VR-Client-Player
-            player_pr: {},      // The PR-Client-Player
-            controller: {},     // The Client-Controller
+        clients: [],
+        timer: {
+            start_value: 15,
+            current_value: undefined,
+            holder: undefined
         },
-        gamers: {
-            player_vr: {},      // The Player-VR which is playing
-            player_pr: {},      // The Player-PR which is playing
-            controller: {},     // The Controller which is handling the game
-        },
-        game: Game(),           // The game info
-        requests: new Map()     // A Map of KEY=Request-ID, VALUE=Message  
+        players: [PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4, PLAYER_5, PLAYER_6, PLAYER_7, PLAYER_8],
     }
 }
 

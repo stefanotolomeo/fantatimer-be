@@ -1,9 +1,8 @@
 const log = require('../config/logger.js')
 
-const controllerManager = require("./logic/socketmanager/ControllerSocketManager")
 const playerManager = require("./logic/socketmanager/PlayerSocketManager")
+const statePlayersManager = require('../logic/StatePlayersManager.js');
 
-const timer = ms => new Promise(res => setTimeout(res, ms))
 
 module.exports = class SocketServer {
   constructor(http) {
@@ -20,21 +19,17 @@ module.exports = class SocketServer {
       },
     });
 
-    this.controllerNamespace = this.io.of("/controller");
     this.playerNamespace = this.io.of("/player");
   }
 
   async init() {
     try {
       console.log("Starting SOCKET")
-      // TODO: load data from DB
-      let  data = {
-        dataForController:"todo",
-        dataForPlayer:"todo"
-      }
 
-      controllerManager.initForController(this, data.dataForController)
-      playerManager.initForPlayer(this, data.dataForPlayer)
+      // Data to be sent to each client at connection
+      let  data = statePlayersManager.getPlayers()
+
+      playerManager.initForPlayer(this, data)
     } catch (e) {
       // TODO: manage this log
       console.error(e)
@@ -42,35 +37,6 @@ module.exports = class SocketServer {
       log.error(`Error while initializing Socket: ${JSON.stringify(e)}`)
     }
 
-  }
-
-  joinRoom(socket, roomName) {
-    try {
-      socket.join(roomName)
-    } catch (e) {
-      log.error(`Error while joining Room=${roomName}: ${JSON.stringify(e)}`)
-    }
-  }
-
-  joinRoomWithSocketId(namespace, socketId, roomName) {
-    try {
-      namespace.sockets.get(socketId).join(roomName)
-    } catch (e) {
-      log.error(`Error while joining Room=${roomName} with SocketId=${socketId}: ${JSON.stringify(e)}`)
-    }
-  }
-
-  async clearRoom(roomName) {
-    try {
-      const socketIds = this.playerNamespace.adapter.rooms.get(roomName);
-      if (!socketIds) {
-        log.debug(`No Clients Found in Room=${roomName}. No one must leave the room.`)
-        return
-      }
-      socketIds.forEach(sockId => this.playerNamespace.sockets.get(sockId).leave(roomName));
-    } catch (e) {
-      log.error(`Error while clearing Room=${roomName}: ${JSON.stringify(e)}`)
-    }
   }
 
   sendTo(namespace, id, message) {
@@ -90,11 +56,4 @@ module.exports = class SocketServer {
     }
   }
 
-  sendToRoom(namespace, socketRoom, message) {
-    try {
-      namespace.to(socketRoom).emit("message", message)
-    } catch (e) {
-      log.error(`Error while sending Message=${message}: ${JSON.stringify(e)}`)
-    }
-  }
 }
