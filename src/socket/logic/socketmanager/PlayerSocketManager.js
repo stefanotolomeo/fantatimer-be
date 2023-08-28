@@ -81,7 +81,7 @@ exports.initForPlayer = function (socketServer, data) {
           }
 
           // (1) Remove the Player from Clients
-          stateClientsManager.resetClient(plClient.client_id, mode)
+          stateClientsManager.resetClient(client.client_id)
           // (2) Remove the Player from Gamers
           // TODO: reset from here as well
           // stateGamersManager.resetPlayer(mode)
