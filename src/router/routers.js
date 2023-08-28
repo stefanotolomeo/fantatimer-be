@@ -44,9 +44,9 @@ module.exports = class ServerRoutes {
 		//-------------- STATUS ---------------//    
 		this.app.get('/api/status', (req, res) => {
 			let currStatus = Object.assign({}, stateManager.status)
-
-			/* let requestsArray = Array.from(currStatus.requests.values())
-			currStatus.requests = requestsArray */
+			
+			let clientsArray = Array.from(currStatus.clients.entries())
+			currStatus.clients = clientsArray
  		
 			res.json(currStatus)
 		});

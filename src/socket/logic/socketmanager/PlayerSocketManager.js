@@ -5,17 +5,12 @@ const { v4: uuid_v4 } = require('uuid');
 const Client = require('../../../model/Client.js');
 const stateClientsManager = require("../../../logic/StateClientsManager");
 const statePlayersManager = require('../../../logic/StatePlayersManager.js');
+const stateTimerManager = require('../../../logic/StateTimerManager.js');
+
 const { notifyToAllClients } = require('../NotifierMessage.js');
 
 const ActionPlayer = require('../../model/player/ActionPlayer.js');
-const TypeConnectionPlayer = require('../../model/player/TypeConnectionPlayer');
-/* 
-
-const messageCreator = require('../MessageCreator.js');
-
-const { processPlayerMessage } = require('../messageprocessor/player/PlayerActionProcessor.js');
-const ModalityPlayerEnum = require('../../model/ModalityPlayerEnum.js');
-*/
+const TypeConnectionPlayer = require('../../model/player/TypeConnectionPlayer')
 
 exports.initForPlayer = function (socketServer, data) {
   let plNamespace = socketServer.playerNamespace
@@ -41,7 +36,7 @@ exports.initForPlayer = function (socketServer, data) {
             log.debug(`New Connection for Client=${clientId} with SocketId=${socket.id}`)
 
             // Add the new Client to Clients-Status
-            stateClientsManager.addNewClient(Client(clientId, socket.id))
+            stateClientsManager.addNewClient(clientId, socket.id)
           }
 
           // In both case (connection/reconnection), save the SocketId and ClientId into the PlayerList
@@ -50,7 +45,8 @@ exports.initForPlayer = function (socketServer, data) {
 
           // Define the content to be passed to this Client
           let dataToPlayer = {
-            players: statePlayersManager.getPlayers()   // All players
+            players: statePlayersManager.getPlayers(),   // All players
+            timer: stateTimerManager.getTimerInfo(),     // All timer-info
           }
 
           // MsgForAll includes also messege to current-connected client
@@ -74,23 +70,24 @@ exports.initForPlayer = function (socketServer, data) {
         try {
           log.debug(`Disconnected Player with Socket-Id=${socket.id} due to: ${reason}`)
           
-          let client = stateClientsManager.getClientBySocketId(socket.id)
-          if(client && client.socket_id && client.socket_id != socket.id) {
+          let clientId = stateClientsManager.getClientBySocketId(socket.id)
+          if(!clientId) {
             log.warn(`Socket-Id=${socket.id} not recognized for Disconnected-Player. Found Socket-Id=${client.socket_id}`)
             return
           }
 
           // (1) Remove the Player from Clients
-          stateClientsManager.resetClient(client.client_id)
+          stateClientsManager.resetClient(clientId)
+          
           // (2) Remove the Player from Gamers
-          // TODO: reset from here as well
-          // stateGamersManager.resetPlayer(mode)
+          statePlayersManager.resetDisconnectedPlayer(clientId)
 
           // (3) Notify to Other clients
 
           // Define the content to be passed to this Client
           let dataToAll = {
-            players: statePlayersManager.getPlayers()   // All players
+            players: statePlayersManager.getPlayers(),   // All players
+            timer: stateTimerManager.getTimerInfo()      // All timer-info
           }
           
           let msgForOthers = {

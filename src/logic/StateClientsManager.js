@@ -14,54 +14,43 @@ const StateClientsManager = () => {
         },
 
         existsClient(clientId) {
-            i = status.findIndex(el => el.client_id == clientId)
-            if(i == -1){
-                return false
-            }
-
-            return true
+            return status.has(clientId)
         },
 
         getClientByClientId(clientId) {
-            i = status.findIndex(el => el.client_id == clientId)
-            if(i == -1){
+            if(!status.has(clientId)) {
                 throw new Error(`Invalid ClientId=${clientId}. Cannot GetClientByClientId`)
             }
 
-            return status[i]
+            return status.get(clientId)
         },
 
         getClientBySocketId(socketId) {
-            i = status.findIndex(el => el.socket_id == socketId)
-            if(i == -1){
+            let foundClientId
+            for (let [key, value] of status.entries()) {
+                if(value == socketId) {
+                    foundClientId = key
+                    break
+                }
+            }
+
+            if(!foundClientId){
                 throw new Error(`Invalid SocketId=${socketId}. Cannot GetClientBySocketId`)
             }
 
-            return status[i]
+            return foundClientId
         },
 
         saveSocketIdForClient(clientId, socketId) {
-
-            i = status.findIndex(el => el.client_id == clientId)
-            if(i == -1){
-                throw new Error(`Invalid ClientId=${clientId} and SocketId=${socketId}. Cannot SaveSockectForClient`)
-            }
-        
-            status[i].socket_id = socketId 
+            status.set(clientId, socketId)
         },
 
-        addNewClient(client) {
-            status.push(client)
+        addNewClient(clientId, socketId) {
+            status.set(clientId, socketId)
         },
 
         resetClient(clientId) {
-
-            i = status.findIndex(el => el.client_id == clientId)
-            if(i == -1){
-                throw new Error(`Invalid ClientId=${clientId}. Cannot ResetClient`)
-            }
-
-            status[i] = Client(clientId)
+            status.delete(clientId)
         },
 
     }
