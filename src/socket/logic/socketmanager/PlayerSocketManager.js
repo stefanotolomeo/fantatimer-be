@@ -5,17 +5,11 @@ const { v4: uuid_v4 } = require('uuid');
 const Client = require('../../../model/Client.js');
 const stateClientsManager = require("../../../logic/StateClientsManager");
 const StatePlayersManager = require('../../../logic/StatePlayersManager.js');
-const { notifyToAllClients, notifyToClientWithId } = require('./NotifierMessage.js');
-/* 
-
-const stateGamersManager = require("../../../logic/game/StateGamersManager");
-const stateGameManager = require("../../../logic/game/StateGameManager");
-const stateRequestManager = require("../../../logic/game/StateRequestManager");
+const { notifyToAllClients } = require('./NotifierMessage.js');
 
 const ActionPlayer = require('../../model/player/ActionPlayer.js');
-
 const TypeConnectionPlayer = require('../../model/player/TypeConnectionPlayer');
-const TypeAuthenticationPlayer = require('../../model/player/TypeAuthenticationPlayer');
+/* 
 
 const messageCreator = require('../MessageCreator.js');
 
@@ -41,7 +35,7 @@ exports.initForPlayer = function (socketServer, data) {
           if (clientId && stateClientsManager.existsClient(clientId)) {
             log.debug(`Reconnection for Client=${clientId} with SocketId=${socket.id}`)
             isNewConnection = false;
-            stateClientsManager.saveSocketIdForClient(socket.id, mode)
+            stateClientsManager.saveSocketIdForClient(clientId, socket.id)
           } else {
             // It's a New-Connection: Save the new Player
             log.debug(`New Connection for Client=${clientId} with SocketId=${socket.id}`)
@@ -56,26 +50,19 @@ exports.initForPlayer = function (socketServer, data) {
 
           // Define the content to be passed to this Client
           let dataToPlayer = {
-            clients: stateClientsManager.getClients(),  // All connected-clients
             players: StatePlayersManager.getPlayers()   // All players
           }
 
-          // Create Message to reply this Client
-          let msgForClient = messageCreator.createMessage(
-            msg.request_id, msg.client_id, socket.id, ActionPlayer.AUTHENTICATION, TypeAuthenticationPlayer.LOAD_DATA, dataToPlayer)
-
-          let msgForOthers = {
+          // MsgForAll includes also messege to current-connected client
+          let msgForAll = {
             request_id: msg.request_id,
-            // action: ActionPlayer.CONNECTION,
-            // type: isNewConnection ? TypeConnectionPlayer.PLAYER_CONNECTED : TypeConnectionPlayer.PLAYER_RECONNECTED,
+            action: ActionPlayer.CONNECTION,
+            type: isNewConnection ? TypeConnectionPlayer.PLAYER_CONNECTED : TypeConnectionPlayer.PLAYER_RECONNECTED,
             payload: dataToPlayer
           }
 
-          // Send the data to the Player
-          notifyToClientWithId(socketServer, plNamespace, socket.id, msgForClient)
-
-          // Send the notification to Controller
-          notifyToAllClients(socketServer, plNamespace, msgForOthers)
+          // Send the notification to AllClients
+          notifyToAllClients(socketServer, plNamespace, msgForAll)
 
         } catch (e) {
           log.error(e)

@@ -10,18 +10,7 @@ exports.notifyToClientWithId = async function (socketServer, plNamespace, socket
   socketServer.sendTo(plNamespace, socketId, msg) 
 }
 
-exports.notifyToAllClients = async function(socketServer, plNamespace, requestId, action, type, payload) {
-    // Notify to All Clients (only if player is connected)
-
-    let msgToAll = messageCreator.createMessage(
-        requestId, 
-        playerVR.client_id, 
-        playerVR.socket_id , 
-        action, 
-        type, 
-        payload
-    )
-
-    log.info(`To All Clients (Action=${action}, Type=${type}) - Payload: ${JSON.stringify(payload)}`)
+exports.notifyToAllClients = async function(socketServer, plNamespace, msgToAll) {
+    log.info(`To All Clients - Message: ${JSON.stringify(msgToAll)}`)
     socketServer.sendToAll(plNamespace, msgToAll) 
 }
