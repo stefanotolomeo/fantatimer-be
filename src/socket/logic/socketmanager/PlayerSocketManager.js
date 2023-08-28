@@ -97,7 +97,7 @@ exports.initForPlayer = function (socketServer, data) {
             payload: dataToAll
           }
 
-          // Send the notification to Controller
+          // Send the notification to Player
           notifyToAllClients(socketServer, plNamespace, msgForOthers)
 
         } catch (e) {
