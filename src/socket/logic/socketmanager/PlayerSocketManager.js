@@ -4,8 +4,8 @@ const { v4: uuid_v4 } = require('uuid');
 
 const Client = require('../../../model/Client.js');
 const stateClientsManager = require("../../../logic/StateClientsManager");
-const StatePlayersManager = require('../../../logic/StatePlayersManager.js');
-const { notifyToAllClients } = require('./NotifierMessage.js');
+const statePlayersManager = require('../../../logic/StatePlayersManager.js');
+const { notifyToAllClients } = require('../NotifierMessage.js');
 
 const ActionPlayer = require('../../model/player/ActionPlayer.js');
 const TypeConnectionPlayer = require('../../model/player/TypeConnectionPlayer');
@@ -42,15 +42,15 @@ exports.initForPlayer = function (socketServer, data) {
 
             // Add the new Client to Clients-Status
             stateClientsManager.addNewClient(Client(clientId, socket.id))
-            
-            // TODO: to be handled
-            // Add the new Player to Game-Status
-            // stateGamersManager.addPlayer(clientId, mode)
           }
+
+          // In both case (connection/reconnection), save the SocketId and ClientId into the PlayerList
+          // TODO: replace TOLO with the player name (as received by the client)
+          statePlayersManager.saveInfoForConnectedPlayer("tolo", clientId, socket.id)
 
           // Define the content to be passed to this Client
           let dataToPlayer = {
-            players: StatePlayersManager.getPlayers()   // All players
+            players: statePlayersManager.getPlayers()   // All players
           }
 
           // MsgForAll includes also messege to current-connected client
@@ -90,8 +90,7 @@ exports.initForPlayer = function (socketServer, data) {
 
           // Define the content to be passed to this Client
           let dataToAll = {
-            clients: stateClientsManager.getClients(),  // All connected-clients
-            players: StatePlayersManager.getPlayers()   // All players
+            players: statePlayersManager.getPlayers()   // All players
           }
           
           let msgForOthers = {

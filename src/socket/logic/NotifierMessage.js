@@ -1,8 +1,8 @@
-const log = require('../../../config/logger.js')
+const log = require('../../config/logger.js')
 
-const messageCreator = require('../MessageCreator.js');
+const messageCreator = require('./MessageCreator.js');
 
-const stateClientsManager = require("../../../logic/StateClientsManager")
+const stateClientsManager = require("../../logic/StateClientsManager.js")
 
 exports.notifyToClientWithId = async function (socketServer, plNamespace, socketId, msg) {
   // Used to send ACK: No check on socketId
