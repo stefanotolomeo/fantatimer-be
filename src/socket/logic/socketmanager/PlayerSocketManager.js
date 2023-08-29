@@ -2,7 +2,6 @@ const log = require('../../../config/logger.js')
 
 const { v4: uuid_v4 } = require('uuid');
 
-const Client = require('../../../model/Client.js');
 const stateClientsManager = require("../../../logic/StateClientsManager");
 const statePlayersManager = require('../../../logic/StatePlayersManager.js');
 const stateTimerManager = require('../../../logic/StateTimerManager.js');

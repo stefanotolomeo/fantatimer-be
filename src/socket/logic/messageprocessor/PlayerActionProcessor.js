@@ -16,7 +16,7 @@ exports.processPlayerMessage = async function (socketServer, plNamespace, msg) {
             break
 
         default:
-            log.warn(`Unrecognized Action for Player=${msg.client_id}. Nothing to do for ACTION=${msg.action}: ${JSON.stringify(msg)}`)
+            log.warn(`Unrecognized ACTION=${msg.action} for Message: ${JSON.stringify(msg)}`)
             return
     }
 }
