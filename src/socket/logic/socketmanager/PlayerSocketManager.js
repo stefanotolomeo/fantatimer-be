@@ -10,7 +10,8 @@ const stateTimerManager = require('../../../logic/StateTimerManager.js');
 const { notifyToAllClients } = require('../NotifierMessage.js');
 
 const ActionPlayer = require('../../model/player/ActionPlayer.js');
-const TypeConnectionPlayer = require('../../model/player/TypeConnectionPlayer')
+const TypeConnectionPlayer = require('../../model/player/TypeConnectionPlayer');
+const { processPlayerMessage } = require('../messageprocessor/PlayerActionProcessor.js');
 
 exports.initForPlayer = function (socketServer, data) {
   let plNamespace = socketServer.playerNamespace
@@ -107,15 +108,15 @@ exports.initForPlayer = function (socketServer, data) {
 
       socket.on("message", async function (msg) {
         try {
-          log.info(`From ${msg.mode} (Action=${msg.action}, Type=${msg.type}) - Message: ${JSON.stringify(msg)}`)
+          log.info(`From Client (Action=${msg.action}, Type=${msg.type}) - Message: ${JSON.stringify(msg)}`)
 
-          // await processPlayerMessage(socketServer, plNamespace, ctrlNamespace, msg)
+          await processPlayerMessage(socketServer, plNamespace, msg)
       
         } catch (e) {
           // TODO: manage this log
           log.error(e)
           log.error(`Cannot Manage Message=${JSON.stringify(msg)}: ${JSON.stringify(e)}`)
-          notifyToPlayerWithId(socketServer, plNamespace, msg.socket_id, `You sent an Invalid Message`, msg.mode)
+          // notifyToPlayerWithId(socketServer, plNamespace, msg.socket_id, `You sent an Invalid Message`, msg.mode)
         }
       });
 

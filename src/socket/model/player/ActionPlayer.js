@@ -5,7 +5,10 @@ const ActionPlayer = {
 
     // Authentication
     // with Types: LOAD_DATA
-    AUTHENTICATION: "authentication",
+    AUTHENTICATION: "authentication",   // TODO: likely not used
+
+    // with Types: STARTED, RELAUNCHED, EXPIRED, SYNCH
+    TIMER: "timer"
 
 }
 
