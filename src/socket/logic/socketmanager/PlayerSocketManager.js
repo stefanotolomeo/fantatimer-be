@@ -39,12 +39,10 @@ exports.initForPlayer = function (socketServer, data) {
             stateClientsManager.addNewClient(clientId, socket.id)
           }
 
-          // In both case (connection/reconnection), save the SocketId and ClientId into the PlayerList
-          // TODO: replace TOLO with the player name (as received by the client)
-          statePlayersManager.saveInfoForConnectedPlayer("tolo", clientId, socket.id)
+          // TODO: just send an ack to the current Client, not everyone
 
           // Define the content to be passed to this Client
-          let dataToPlayer = {
+          /* let dataToPlayer = {
             players: statePlayersManager.getPlayers(),   // All players
             timer: stateTimerManager.getTimerInfo(),     // All timer-info
           }
@@ -58,7 +56,7 @@ exports.initForPlayer = function (socketServer, data) {
           }
 
           // Send the notification to AllClients
-          notifyToAllClients(socketServer, plNamespace, msgForAll)
+          notifyToAllClients(socketServer, plNamespace, msgForAll) */
 
         } catch (e) {
           log.error(e)

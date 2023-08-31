@@ -1,13 +1,13 @@
 const Player = require("./Player")
 
-const PLAYER_1 = Player("tolo", "giavazzi", "pass1111")
-const PLAYER_2 = Player("ivan", "aaa", "pass1111")
-const PLAYER_3 = Player("fra", "aaa", "pass1111")
-const PLAYER_4 = Player("dennis", "aaa", "pass1111")
-const PLAYER_5 = Player("ema", "aaa", "pass1111")
-const PLAYER_6 = Player("cari", "aaa", "pass1111")
-const PLAYER_7 = Player("nico", "aaa", "pass1111")
-const PLAYER_8 = Player("davide", "aaa", "pass1111")
+const PLAYER_1 = Player("tolo", "gia", "aaa")
+const PLAYER_2 = Player("ivan", "sen", "bbb")
+const PLAYER_3 = Player("fra", "sky", "ccc")
+const PLAYER_4 = Player("dennis", "rea", "ddd")
+const PLAYER_5 = Player("ema", "vig", "eee")
+const PLAYER_6 = Player("cari", "ich", "fff")
+const PLAYER_7 = Player("nico", "rob", "ggg")
+const PLAYER_8 = Player("davide", "don", "eee")
 
 const State = () => {
     return {

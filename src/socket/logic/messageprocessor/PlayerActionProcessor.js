@@ -1,6 +1,7 @@
 const log = require('../../../config/logger.js')
 
 const ActionPlayer = require('../../model/player/ActionPlayer.js');
+const { processTypeLogin } = require('./TypeLoginProcessor.js');
 const { processTypeTimer } = require('./TypeTimerProcessor.js');
 
 exports.processPlayerMessage = async function (socketServer, plNamespace, msg) {
@@ -13,6 +14,10 @@ exports.processPlayerMessage = async function (socketServer, plNamespace, msg) {
         
         case ActionPlayer.TIMER:
             await processTypeTimer(socketServer, plNamespace, msg)
+            break
+
+        case ActionPlayer.LOGIN:
+            await processTypeLogin(socketServer, plNamespace, msg)
             break
 
         default:

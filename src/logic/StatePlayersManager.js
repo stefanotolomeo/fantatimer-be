@@ -12,11 +12,11 @@ const StatePlayersManager = () => {
             return status
         },
 
-        saveInfoForConnectedPlayer(name, clientId, socketId) {
+        saveInfoForConnectedPlayer(username, password, clientId, socketId) {
 
-            i = status.findIndex(el => el.name == name)
+            i = status.findIndex(el => el.username == username && el.password == password)
             if(i == -1){
-                throw new Error(`Invalid Name=${name}. Cannot SavePlayerAsConnected`)
+                throw new Error(`Invalid Username=${username}. Cannot SavePlayerAsConnected`)
             }
         
             status[i].client_id = clientId

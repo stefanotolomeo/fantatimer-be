@@ -8,7 +8,10 @@ const ActionPlayer = {
     AUTHENTICATION: "authentication",   // TODO: likely not used
 
     // with Types: STARTED, RELAUNCHED, EXPIRED, SYNCH
-    TIMER: "timer"
+    TIMER: "timer",
+
+    
+    LOGIN: "login"
 
 }
 
