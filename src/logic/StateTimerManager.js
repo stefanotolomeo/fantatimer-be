@@ -25,9 +25,10 @@ const StateTimerManager = () => {
             status = timerInfo
         },
 
-        setStartingCondition() {
+        setStartingCondition(currentHolder) {
             status.is_started = true
             status.current_value = status.start_value
+            status.holder = currentHolder
         },
 
         setRelaunchingCondition(currentHolder) {

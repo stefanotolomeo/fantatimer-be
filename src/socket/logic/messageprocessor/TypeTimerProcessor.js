@@ -31,7 +31,7 @@ exports.processTypeTimer = async function (socketServer, plNamespace, msg) {
             log.debug("Timer-Started Request: MyInterval not exists: creating..")
 
             // Set Starting Conditions
-            stateTimerManager.setStartingCondition()
+            stateTimerManager.setStartingCondition(msg.payload.my_username)
             myInterval = setInterval(decreaseTimerAndNotify, 1000, socketServer, plNamespace)
 
             timerInfo = stateTimerManager.getTimerInfo()
@@ -49,8 +49,7 @@ exports.processTypeTimer = async function (socketServer, plNamespace, msg) {
             break
 
         case TypeTimer.RELAUNCHED:
-            // TODO: set this
-            stateTimerManager.setRelaunchingCondition("currentholder")
+            stateTimerManager.setRelaunchingCondition(msg.payload.my_username)
 
             timerInfo = stateTimerManager.getTimerInfo()
 
