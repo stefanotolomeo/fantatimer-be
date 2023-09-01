@@ -55,6 +55,13 @@ module.exports = class ServerRoutes {
 			let currStatus = Object.assign({}, stateManager.status.clients)
 			res.json(currStatus)
 		});
+
+		//-------------- PLAYER ---------------//
+		this.app.use(this.express.static(path.join(__dirname, "../../out_player", "build")));
+
+		this.app.get("/asta", (req, res) => {
+			res.sendFile(path.join(__dirname, "../../out_player/build", "index.html"));
+		});
 	}
 
 }
