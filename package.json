@@ -5,8 +5,8 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "set MODE=dev&& node ./src/app.js",
-    "serve": "set MODE=dev&& nodemon ./src/app.js",
+    "start": "set MODE=dev && node ./src/app.js",
+    "serve": "set MODE=dev && nodemon ./src/app.js",
     "test": "mocha --recursive"
   },
   "repository": {

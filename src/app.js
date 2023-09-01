@@ -34,8 +34,8 @@ var privateKey = server.fs.readFileSync(server.config.privateKey, 'utf8'); //old
 var certificate = server.fs.readFileSync(server.config.certificate, 'utf8'); //old:cert.pem //v3:server.crt
 var credentials = { key: privateKey, cert: certificate, passphrase: "abiliaxoom" }; //old:abiliaxoom //v3: AbiliaXOOM
 
-
-var port = server.config.httpsPort || 3000;
+console.log("PROCESS ENV PORT is ", process.env.port)
+var port = process.env.PORT || server.config.httpsPort // This is 3000
 /*server.kill(port, 'tcp')
   .then(function () { log.debug(`***** Killing processes on port ${port}`);  })
   .catch(console.log); //kill whatever process using port*/
