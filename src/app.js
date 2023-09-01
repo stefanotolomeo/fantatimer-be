@@ -21,15 +21,10 @@ server.fs = require('fs');
 
 server.kill = require('kill-port');
 
-/* //DISABLED HTTP SERVER
 server.http = require('http');
-server.httpServer = server.http.createServer(server.app);
-server.httpServer.listen(server.config.httpServer.port, () => {
-  console.log('Server listening http on *:'+server.config.httpServer.port)
-  log.debug('Server listening http on *:'+server.config.httpServer.port)
-});*/
-
 server.https = require('https');
+
+// TODO: not used
 var privateKey = server.fs.readFileSync(server.config.privateKey, 'utf8'); //old: key.pem //v3: server.key
 var certificate = server.fs.readFileSync(server.config.certificate, 'utf8'); //old:cert.pem //v3:server.crt
 var credentials = { key: privateKey, cert: certificate, passphrase: "abiliaxoom" }; //old:abiliaxoom //v3: AbiliaXOOM
@@ -40,10 +35,12 @@ var port = process.env.PORT || server.config.httpsPort // This is 3000
   .then(function () { log.debug(`***** Killing processes on port ${port}`);  })
   .catch(console.log); //kill whatever process using port*/
 
-startHttps();
+  startHttp()
+// startHttps();
 
 const SocketServer = require('./socket/socket');
-server.socket = new SocketServer(server.httpsServer);
+// server.socket = new SocketServer(server.httpsServer);
+server.socket = new SocketServer(server.httpServer);
 server.socket.init();
 
 server.app.head("/", server.cors(), (req, res) => {
@@ -53,11 +50,18 @@ server.app.head("/", server.cors(), (req, res) => {
 const ServerRoutes = require('./router/routers');
 server.routes = new ServerRoutes(server);
 
+function startHttp() {
+  server.httpServer = server.http.createServer(server.app);
+  server.httpServer.listen(port, () => {
+  console.log('Server HTTP listening http on *:'+ port)
+  log.debug('Server HTTP listening http on *:'+ port)
+});
+}
 
 function startHttps() {
   server.httpsServer = server.https.createServer(credentials, server.app);
   server.httpsServer.listen(port, () => {
-    console.log('Server listening https on *:' + port)
-    log.debug('Server listening https on *:' + port)
+    console.log('Server HTTPS listening https on *:' + port)
+    log.debug('Server HTTPS listening https on *:' + port)
   });
 }
