@@ -26,9 +26,11 @@ exports.initForPlayer = function (socketServer, data) {
         try {
           log.info(`Player Authenticated with Message=${JSON.stringify(msg)}`)
 
-          if (clientId && statePlayersManager.existsPlayerWithClientId(clientId)) {
+          let currentPl = statePlayersManager.getPlayerByClientId(clientId)
+          if (clientId && typeof (currentPl) !== "undefined") {
             // This is a RECONNECTION
             log.info(`Reconnection for Client=${clientId} with SocketId=${socket.id}`)
+
             stateClientsManager.saveSocketIdForClient(clientId, socket.id)
 
             statePlayersManager.saveInfoForConnectedPlayerByClientId(clientId, socket.id)
@@ -37,7 +39,10 @@ exports.initForPlayer = function (socketServer, data) {
             let dataToPlayer = {
               players: statePlayersManager.getPlayers(),   // All players
               timer: stateTimerManager.getTimerInfo(),     // All timer-info
-              new_connected_client_id: msg.client_id
+              new_connected_client_id: msg.client_id,
+              username: currentPl.username,
+              password: currentPl.password
+
           }
 
           // MsgForAll includes also messege to current-connected client

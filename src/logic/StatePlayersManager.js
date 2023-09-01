@@ -34,12 +34,12 @@ const StatePlayersManager = () => {
             // status[i].client_id = undefined
         },
 
-        existsPlayerWithClientId(clientId) {
+        getPlayerByClientId(clientId) {
             i = status.findIndex(el => el.client_id == clientId)
             if(i == -1){
-                return false
+                return undefined
             }
-            return true
+            return status[i]
         },
 
         saveInfoForConnectedPlayerByClientId(clientId, socketId) {
