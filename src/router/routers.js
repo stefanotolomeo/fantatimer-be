@@ -57,10 +57,10 @@ module.exports = class ServerRoutes {
 		});
 
 		//-------------- PLAYER ---------------//
-		this.app.use(this.express.static(path.join(__dirname, "../../out_player", "build")));
+		this.app.use(this.express.static(path.join(__dirname, "../../out_client", "build")));
 
 		this.app.get("/asta", (req, res) => {
-			res.sendFile(path.join(__dirname, "../../out_player/build", "index.html"));
+			res.sendFile(path.join(__dirname, "../../out_client/build", "index.html"));
 		});
 	}
 
