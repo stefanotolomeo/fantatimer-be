@@ -24,39 +24,41 @@ exports.initForPlayer = function (socketServer, data) {
       socket.on("authenticate", (msg) => {
         let clientId = msg.client_id
         try {
-          log.debug(`Player Authenticated with Message=${JSON.stringify(msg)}`)
+          log.info(`Player Authenticated with Message=${JSON.stringify(msg)}`)
 
-          let isNewConnection = true
-          if (clientId && stateClientsManager.existsClient(clientId)) {
-            log.debug(`Reconnection for Client=${clientId} with SocketId=${socket.id}`)
-            isNewConnection = false;
+          if (clientId && statePlayersManager.existsPlayerWithClientId(clientId)) {
+            // This is a RECONNECTION
+            log.info(`Reconnection for Client=${clientId} with SocketId=${socket.id}`)
             stateClientsManager.saveSocketIdForClient(clientId, socket.id)
-          } else {
-            // It's a New-Connection: Save the new Player
-            log.debug(`New Connection for Client=${clientId} with SocketId=${socket.id}`)
 
-            // Add the new Client to Clients-Status
-            stateClientsManager.addNewClient(clientId, socket.id)
-          }
+            statePlayersManager.saveInfoForConnectedPlayerByClientId(clientId, socket.id)
 
-          // TODO: just send an ack to the current Client, not everyone
-
-          // Define the content to be passed to this Client
-          /* let dataToPlayer = {
-            players: statePlayersManager.getPlayers(),   // All players
-            timer: stateTimerManager.getTimerInfo(),     // All timer-info
+            // Define the content to be passed to this Client
+            let dataToPlayer = {
+              players: statePlayersManager.getPlayers(),   // All players
+              timer: stateTimerManager.getTimerInfo(),     // All timer-info
+              new_connected_client_id: msg.client_id
           }
 
           // MsgForAll includes also messege to current-connected client
           let msgForAll = {
-            request_id: msg.request_id,
-            action: ActionPlayer.CONNECTION,
-            type: isNewConnection ? TypeConnectionPlayer.PLAYER_CONNECTED : TypeConnectionPlayer.PLAYER_RECONNECTED,
-            payload: dataToPlayer
+              request_id: msg.request_id,
+              action: ActionPlayer.CONNECTION,
+              type: TypeConnectionPlayer.PLAYER_CONNECTED,    // No differences here if first CONNECTION or RECONNECTION
+              payload: dataToPlayer
           }
 
           // Send the notification to AllClients
-          notifyToAllClients(socketServer, plNamespace, msgForAll) */
+          notifyToAllClients(socketServer, plNamespace, msgForAll)
+
+          return
+          }
+
+          // This is a NEW-CONNECTION
+          log.info(`New Connection for Client=${clientId} with SocketId=${socket.id}`)
+
+          // Add the new Client to Clients-Status
+          stateClientsManager.addNewClient(clientId, socket.id)
 
         } catch (e) {
           log.error(e)

@@ -31,7 +31,25 @@ const StatePlayersManager = () => {
             }
 
             status[i].socket_id = undefined
-            status[i].client_id = undefined
+            // status[i].client_id = undefined
+        },
+
+        existsPlayerWithClientId(clientId) {
+            i = status.findIndex(el => el.client_id == clientId)
+            if(i == -1){
+                return false
+            }
+            return true
+        },
+
+        saveInfoForConnectedPlayerByClientId(clientId, socketId) {
+            i = status.findIndex(el => el.client_id == clientId)
+            if(i == -1){
+                throw new Error(`Invalid ClientId=${clientId}. Cannot SaveInfoForConnectedPlayerByClientId`)
+            }
+        
+            status[i].client_id = clientId
+            status[i].socket_id = socketId 
         },
 
     }
