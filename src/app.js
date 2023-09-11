@@ -24,13 +24,8 @@ server.kill = require('kill-port');
 server.http = require('http');
 server.https = require('https');
 
-// TODO: not used
-var privateKey = server.fs.readFileSync(server.config.privateKey, 'utf8'); //old: key.pem //v3: server.key
-var certificate = server.fs.readFileSync(server.config.certificate, 'utf8'); //old:cert.pem //v3:server.crt
-var credentials = { key: privateKey, cert: certificate, passphrase: "abiliaxoom" }; //old:abiliaxoom //v3: AbiliaXOOM
-
 console.log("PROCESS ENV PORT is ", process.env.port)
-var port = process.env.PORT || server.config.httpsPort // This is 3000
+var port = process.env.PORT || server.config.portHttp // This is 3000
 /*server.kill(port, 'tcp')
   .then(function () { log.debug(`***** Killing processes on port ${port}`);  })
   .catch(console.log); //kill whatever process using port*/
@@ -58,6 +53,7 @@ function startHttp() {
 });
 }
 
+/* NOT USED */
 function startHttps() {
   server.httpsServer = server.https.createServer(credentials, server.app);
   server.httpsServer.listen(port, () => {
