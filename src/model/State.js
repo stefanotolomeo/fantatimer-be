@@ -13,7 +13,7 @@ const State = () => {
     return {
         clients: new Map(),
         timer: {
-            start_value: 15,
+            start_value: 10,
             current_value: undefined,
             holder: undefined,
             is_started: false,
